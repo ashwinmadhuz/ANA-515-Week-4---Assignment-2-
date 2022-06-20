@@ -1,0 +1,59 @@
+---
+title: "Soccer Predictions"
+author: "Ashwin Madhusudan"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    highlight: pygments
+    theme: sandstone
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Description of Dataset
+
+The data set consists of soccer match result data based off a revised version of ESPN's soccer power index (SPI) ratings that was initially created for international teams, but this dataset incorporates club data going back to 1888. The ratings have a defensive and offensive rating which in turn product an overall SPI rating, which represents the percentage of available points in a game between two teams, with a win being 3 points, a tie being 1 point and a loss being 0 points. Given this rating for any two random teams, a match result can then be projected. The dataset file is a flat file that is saved in a CSV file format.
+
+## Reading the Data
+```{r }
+library(readr)
+soccermatches <- read_csv("spi_matches.csv")
+soccermatches
+# As you can see above, I have used the read_csv function to read my csv data file into R. 
+#This function comes from the readr package and the advantage of using readr over base R
+#functions is that they typically fun much faster when compared to the base read.csv() function.
+```
+
+## Clean the Data
+```{r}
+soccermatchesfinal <- plyr::rename(soccermatches, c("date" = "Match_Date"))
+soccermatchesfinal$Match_Date <- format(soccermatchesfinal$Match_Date, format = "%m/%d/%y")
+soccermatchesfinal
+```
+
+## Characteristics of the Data
+```{r}
+num_rows <- nrow(soccermatchesfinal)
+num_columns <- ncol(soccermatchesfinal)
+```
+
+This data frame has `r num_rows` rows and `r num_columns` columns. The names of the columns and a brief description of each are in the table below:
+
+```{r}
+column_names <- c("season","Match_Date","league_id","league","team1","team2","spi1","spi2","prob1","prob2","probtie","proj_score1","proj_score2","importance1","importance2","score1","score2","xg1","xg2","nsxg1","nsxg2","adj_score1","adj_score2")
+column_descriptions = c("soccer season year","date of soccer match","unique id for corresponding soccer league","soccer league that the team belongs to","team one","team two","SPI rating for team one","SPI rating for team two","probability of winning for team one","probability of winning for team two","probability of a tied game","Expected goals from team one","Expected goals from team two","measure of how much the outcome of the match will change each team’s statistical outlook on the season for team one","measure of how much the outcome of the match will change each team’s statistical outlook on the season for team two","score for team one","score for team two","shot based expected goals for team one","shot based expected goals for team two","non-shot based expected goals for team one","non-shot based expected goals for team two","adjusted projected goals for team one","adjusted projected goals for team two")
+columntable <- data.frame(column_names, column_descriptions)
+columntable
+knitr::kable(columntable, "pipe")
+```
+
+## Summary Statistics
+```{r}
+soccermatchessubset <- soccermatchesfinal[, (names(soccermatchesfinal) %in% c("season","Match_Date","league"))]
+soccermatchessubset
+soccermatchessummary <- summary(soccermatchessubset)
+soccermatchessummary
+```
+
